@@ -85,7 +85,16 @@ export default async function Dashboard({
               {session.user.name} · {m.role} · {m.plan === "free" ? "Free" : "Pro"}
             </p>
           </div>
-          <a href="/auth/logout" className="text-sm text-neutral-500 hover:text-black">Log out</a>
+          <div className="flex items-center gap-3">
+            {!isTalent && m.plan === "free" && (
+              <form method="POST" action="/api/checkout">
+                <button className="rounded-lg bg-black px-4 py-2 text-sm text-white">
+                  Upgrade to Pro — $29/seat
+                </button>
+              </form>
+            )}
+            <a href="/auth/logout" className="text-sm text-neutral-500 hover:text-black">Log out</a>
+          </div>
         </header>
 
         {new_key && (
