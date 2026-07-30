@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
-import { db } from "@/lib/db";
+import { db, logEvent } from "@/lib/db";
 
 export async function POST(request: Request) {
   const session = await auth0.getSession();
@@ -16,5 +16,9 @@ export async function POST(request: Request) {
     .run(orgId, name, slug, sub);
   db.prepare("INSERT INTO members (id, org_id, auth0_sub, email, name, role) VALUES (?,?,?,?,?,'owner')")
     .run(crypto.randomUUID(), orgId, sub, email ?? "", userName ?? email ?? "Owner");
+  logEvent({
+    org_id: orgId, actor_type: "member", actor_label: userName ?? email ?? "Owner",
+    type: "org.created", meta: { name },
+  });
   return NextResponse.redirect(new URL("/dashboard", request.url), 303);
 }
