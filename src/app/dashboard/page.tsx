@@ -1,242 +1,230 @@
+import Link from "next/link";
 import { auth0 } from "@/lib/auth0";
-import { db, getMembership } from "@/lib/db";
+import { db, getMembership, resolveGrantStatus, type Grant } from "@/lib/db";
+import {
+  Badge, Card, Chip, EmptyState, PageHeader, StatCard, TimelineItem,
+  btnPrimary, btnSecondary, btnDanger, inputCls,
+} from "@/components/ui";
+import { daysUntil, eventTitle, type EventRow } from "@/lib/events";
 
-type GrantRow = {
-  id: string; title: string; scope_platforms: string; scope_project: string;
-  expires_at: string; status: string; talent_name: string;
-};
-type ReceiptRow = {
-  id: string; grant_id: string; action: string; platform: string;
-  result: string; reason: string; signature: string; created_at: string;
-};
-
-const PILL: Record<string, string> = {
-  requested: "bg-amber-50 text-amber-700 border-amber-200",
-  active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  allowed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  denied: "bg-neutral-100 text-neutral-500 border-neutral-200",
-  revoked: "bg-red-50 text-red-700 border-red-200",
-};
-
-function Pill({ label }: { label: string }) {
-  return (
-    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${PILL[label] ?? PILL.denied}`}>
-      {label}
-    </span>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-5">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: Promise<{ new_key?: string }>;
-}) {
-  const { new_key } = await searchParams;
+export default async function Dashboard() {
   const session = await auth0.getSession();
-  if (!session) return null; // proxy redirects unauthenticated users
+  if (!session) return null;
   const m = getMembership(session.user.sub);
 
   if (!m) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-8">
-        <h1 className="text-2xl font-semibold">Create your studio</h1>
-        <p className="text-neutral-500">
-          Set up an organization to start requesting likeness grants. Talent joins via invite.
-        </p>
+      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-8 text-zinc-900">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">cameo</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.01em]">Set up your studio</h1>
+          <p className="mt-2 text-sm text-zinc-500">
+            Create an organization to start requesting license grants. Rights holders
+            join via invite link — no emails are sent.
+          </p>
+        </div>
         <form method="POST" action="/api/orgs" className="flex gap-2">
-          <input name="name" required placeholder="Studio name"
-            className="flex-1 rounded-lg border border-neutral-300 px-3 py-2" />
-          <button className="rounded-lg bg-black px-5 py-2 text-white">Create</button>
+          <input name="name" required placeholder="Studio name" className={`flex-1 ${inputCls}`} />
+          <button className={btnPrimary}>Create studio</button>
         </form>
       </main>
     );
   }
 
-  const isTalent = m.role === "talent";
-  const grants = (isTalent
-    ? db.prepare(`SELECT g.*, mem.name AS talent_name FROM grants g
-        JOIN members mem ON mem.id = g.talent_member_id
-        WHERE g.talent_member_id = ? ORDER BY g.created_at DESC`).all(m.id)
-    : db.prepare(`SELECT g.*, mem.name AS talent_name FROM grants g
-        JOIN members mem ON mem.id = g.talent_member_id
-        WHERE g.org_id = ? ORDER BY g.created_at DESC`).all(m.org_id)) as GrantRow[];
-  const receipts = (isTalent
-    ? db.prepare(`SELECT r.* FROM receipts r JOIN grants g ON g.id = r.grant_id
-        WHERE g.talent_member_id = ? ORDER BY r.created_at DESC LIMIT 20`).all(m.id)
-    : db.prepare(`SELECT * FROM receipts WHERE org_id = ? ORDER BY created_at DESC LIMIT 20`)
-        .all(m.org_id)) as ReceiptRow[];
+  if (m.role === "talent") return <TalentInbox memberId={m.id} orgName={m.org_name} />;
+  return <StudioOverview orgId={m.org_id} />;
+}
+
+function StudioOverview({ orgId }: { orgId: string }) {
+  const grants = (db.prepare("SELECT * FROM grants WHERE org_id = ?").all(orgId) as Grant[])
+    .map((g) => ({ ...g, status: resolveGrantStatus(g) }));
+  const pending = grants.filter((g) => g.status === "pending").length;
+  const active = grants.filter((g) => g.status === "active");
+  const expiringSoon = active.filter((g) => daysUntil(g.expires_at) <= 30).length;
+  const dayAgo = new Date(Date.now() - 86400_000).toISOString();
+  const checks = db.prepare(
+    "SELECT result, COUNT(*) AS n FROM receipts WHERE org_id = ? AND created_at > ? GROUP BY result"
+  ).all(orgId, dayAgo) as { result: string; n: number }[];
+  const allowed24 = checks.find((c) => c.result === "allowed")?.n ?? 0;
+  const denied24 = checks.find((c) => c.result === "denied")?.n ?? 0;
+  const events = db.prepare(
+    "SELECT * FROM events WHERE org_id = ? ORDER BY created_at DESC LIMIT 15"
+  ).all(orgId) as EventRow[];
+  const members = db.prepare(
+    "SELECT COUNT(*) AS n FROM members WHERE org_id = ? AND role = 'talent'"
+  ).get(orgId) as { n: number };
+  const keys = db.prepare("SELECT COUNT(*) AS n FROM api_keys WHERE org_id = ?")
+    .get(orgId) as { n: number };
 
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-900">
-      <div className="mx-auto max-w-5xl space-y-6 p-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold">{m.org_name}</h1>
-            <p className="text-sm text-neutral-500">
-              {session.user.name} · {m.role} · {m.plan === "free" ? "Free" : "Pro"}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {!isTalent && m.plan === "free" && (
-              <form method="POST" action="/api/checkout">
-                <button className="rounded-lg bg-black px-4 py-2 text-sm text-white">
-                  Upgrade to Pro — $29/seat
-                </button>
-              </form>
-            )}
-            <a href="/auth/logout" className="text-sm text-neutral-500 hover:text-black">Log out</a>
-          </div>
-        </header>
-
-        {new_key && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
-            <p className="font-medium text-emerald-800">API key created — copy it now, shown once:</p>
-            <code className="mt-1 block font-mono text-emerald-900">{new_key}</code>
-          </div>
-        )}
-
-        {!isTalent && <StudioPanels orgId={m.org_id} />}
-
-        <Section title={isTalent ? "Requests for your likeness" : "Grants"}>
-          {grants.length === 0 && <p className="text-sm text-neutral-400">No grants yet.</p>}
-          <ul className="divide-y divide-neutral-100">
-            {grants.map((g) => (
-              <li key={g.id} className="flex items-center justify-between gap-4 py-3">
-                <div>
-                  <p className="font-medium">{g.title}</p>
-                  <p className="text-sm text-neutral-500">
-                    {g.talent_name} · {g.scope_project} ·{" "}
-                    {(JSON.parse(g.scope_platforms) as string[]).join(", ")} · until{" "}
-                    {g.expires_at.slice(0, 10)}
-                  </p>
-                  <p className="font-mono text-xs text-neutral-400">{g.id}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Pill label={g.status} />
-                  {isTalent && g.status === "requested" && (
-                    <>
-                      <DecisionButton grantId={g.id} action="approve" label="Approve"
-                        cls="bg-black text-white" />
-                      <DecisionButton grantId={g.id} action="deny" label="Deny"
-                        cls="border border-neutral-300" />
-                    </>
-                  )}
-                  {isTalent && g.status === "active" && (
-                    <DecisionButton grantId={g.id} action="revoke" label="Revoke"
-                      cls="border border-red-300 text-red-700" />
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Section>
-
-        <Section title={isTalent ? "Where your likeness was used" : "Consent receipts"}>
-          {receipts.length === 0 && <p className="text-sm text-neutral-400">No checks yet.</p>}
-          <table className="w-full text-sm">
-            <tbody className="divide-y divide-neutral-100">
-              {receipts.map((r) => (
-                <tr key={r.id}>
-                  <td className="py-2 pr-3"><Pill label={r.result} /></td>
-                  <td className="py-2 pr-3">{r.action} · {r.platform}</td>
-                  <td className="py-2 pr-3 text-neutral-500">{r.reason}</td>
-                  <td className="py-2 pr-3 font-mono text-xs text-neutral-400">
-                    sig {r.signature.slice(0, 12)}…
-                  </td>
-                  <td className="py-2 font-mono text-xs text-neutral-400">{r.created_at.slice(0, 19)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Section>
+    <>
+      <PageHeader
+        title="Overview"
+        description="Your consent ledger at a glance."
+        action={
+          <Link href="/dashboard/grants" className={btnPrimary}>Request clearance</Link>
+        }
+      />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Pending clearance" value={String(pending)}
+          sub={pending > 0 ? "awaiting rights holders" : "all clear"} />
+        <StatCard label="Active grants" value={String(active.length)} />
+        <StatCard label="Expiring ≤ 30d" value={String(expiringSoon)}
+          sub={expiringSoon > 0 ? "renewals needed" : "no renewals due"} />
+        <StatCard label="Checks · 24h" value={String(allowed24 + denied24)}
+          sub={`${allowed24} allowed / ${denied24} denied`} />
       </div>
-    </main>
-  );
-}
 
-function DecisionButton({ grantId, action, label, cls }: {
-  grantId: string; action: string; label: string; cls: string;
-}) {
-  return (
-    <form method="POST" action="/api/grants/decision">
-      <input type="hidden" name="grant_id" value={grantId} />
-      <input type="hidden" name="action" value={action} />
-      <button className={`rounded-lg px-3 py-1.5 text-sm ${cls}`}>{label}</button>
-    </form>
-  );
-}
-
-function StudioPanels({ orgId }: { orgId: string }) {
-  const talent = db.prepare(
-    "SELECT id, name, email FROM members WHERE org_id = ? AND role = 'talent'"
-  ).all(orgId) as { id: string; name: string; email: string }[];
-  const invites = db.prepare(
-    "SELECT token, email, role FROM invites WHERE org_id = ? AND status = 'pending'"
-  ).all(orgId) as { token: string; email: string; role: string }[];
-
-  return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Section title="Request a grant">
-        {talent.length === 0 ? (
-          <p className="text-sm text-neutral-400">Invite talent first.</p>
-        ) : (
-          <form method="POST" action="/api/grants" className="space-y-3 text-sm">
-            <select name="talent_member_id" className="w-full rounded-lg border border-neutral-300 px-3 py-2">
-              {talent.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.email})</option>)}
-            </select>
-            <input name="title" required placeholder="Grant title (e.g. Lead role, S1)"
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2" />
-            <input name="project" required placeholder="Project (e.g. Billionaire's Regret)"
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2" />
-            <div className="flex flex-wrap gap-3">
-              {["dramabox", "reelshort", "tiktok", "youtube"].map((p) => (
-                <label key={p} className="flex items-center gap-1.5">
-                  <input type="checkbox" name="platforms" value={p} /> {p}
-                </label>
+      <div className="mt-6">
+        <Card title="Recent activity">
+          {events.length === 0 ? (
+            <EmptyState
+              icon="◎"
+              title="Nothing in the ledger yet"
+              body="Three steps to your first signed receipt: invite a rights holder, request a license grant, mint an API key."
+              action={
+                <div className="flex gap-2">
+                  <Link href="/dashboard/team" className={btnSecondary}>1 · Invite</Link>
+                  <Link href="/dashboard/grants" className={btnSecondary}>2 · Request grant</Link>
+                  <Link href="/dashboard/developers" className={btnSecondary}>3 · Mint key</Link>
+                </div>
+              }
+            />
+          ) : (
+            <ul>
+              {events.map((e, i) => (
+                <TimelineItem
+                  key={e.id}
+                  title={eventTitle(e)}
+                  actor={e.actor_label}
+                  timestamp={e.created_at.slice(0, 19).replace("T", " ")}
+                  type={e.type}
+                  last={i === events.length - 1}
+                />
               ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <input name="days" type="number" defaultValue={90}
-                className="w-24 rounded-lg border border-neutral-300 px-3 py-2" />
-              <span className="text-neutral-500">days</span>
-              <button className="ml-auto rounded-lg bg-black px-4 py-2 text-white">Request</button>
-            </div>
-          </form>
-        )}
-      </Section>
+            </ul>
+          )}
+        </Card>
+      </div>
 
-      <Section title="Team & API">
-        <form method="POST" action="/api/invites" className="flex gap-2 text-sm">
-          <input name="email" type="email" required placeholder="email"
-            className="flex-1 rounded-lg border border-neutral-300 px-3 py-2" />
-          <select name="role" className="rounded-lg border border-neutral-300 px-2">
-            <option value="talent">talent</option>
-            <option value="producer">producer</option>
-          </select>
-          <button className="rounded-lg bg-black px-4 py-2 text-white">Invite</button>
-        </form>
-        <ul className="mt-3 space-y-1 text-xs text-neutral-500">
-          {invites.map((i) => (
-            <li key={i.token} className="font-mono">
-              {i.email} ({i.role}): /invite/{i.token}
-            </li>
+      {(members.n === 0 || keys.n === 0) && events.length > 0 && (
+        <p className="mt-4 text-sm text-zinc-500">
+          Setup:{" "}
+          {members.n === 0 && (
+            <Link href="/dashboard/team" className="underline hover:text-zinc-900">
+              invite a rights holder
+            </Link>
+          )}
+          {members.n === 0 && keys.n === 0 && " · "}
+          {keys.n === 0 && (
+            <Link href="/dashboard/developers" className="underline hover:text-zinc-900">
+              mint an API key
+            </Link>
+          )}
+        </p>
+      )}
+    </>
+  );
+}
+
+function TalentInbox({ memberId, orgName }: { memberId: string; orgName: string }) {
+  const grants = (db.prepare(
+    "SELECT * FROM grants WHERE talent_member_id = ? ORDER BY created_at DESC"
+  ).all(memberId) as Grant[]).map((g) => ({ ...g, status: resolveGrantStatus(g) }));
+  const pending = grants.filter((g) => g.status === "pending");
+  const active = grants.filter((g) => g.status === "active");
+
+  return (
+    <>
+      <PageHeader
+        title="Inbox"
+        description="Clearance requests for your likeness. Your likeness, your terms."
+      />
+      {pending.length === 0 ? (
+        <EmptyState
+          icon="✓"
+          title="No pending requests"
+          body={`When ${orgName} requests a license to your likeness, it appears here in plain language for you to grant or decline.`}
+        />
+      ) : (
+        <div className="space-y-4">
+          {pending.map((g) => (
+            <GrantRequestCard key={g.id} grant={g} orgName={orgName} />
           ))}
-        </ul>
-        <form method="POST" action="/api/keys" className="mt-4">
-          <button className="rounded-lg border border-neutral-300 px-4 py-2 text-sm">
-            Mint API key
-          </button>
+        </div>
+      )}
+
+      {active.length > 0 && (
+        <div className="mt-8">
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+            Active grants
+          </h2>
+          <div className="space-y-3">
+            {active.map((g) => (
+              <div key={g.id}
+                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-4">
+                <div>
+                  <Link href={`/dashboard/grants/${g.id}`}
+                    className="text-sm font-medium text-zinc-900 hover:underline">
+                    {g.title}
+                  </Link>
+                  <p className="mt-0.5 text-[13px] tabular-nums text-zinc-500">
+                    {g.scope_project} · expires in {daysUntil(g.expires_at)} days
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge status="active" />
+                  <form method="POST" action="/api/grants/decision">
+                    <input type="hidden" name="grant_id" value={g.id} />
+                    <input type="hidden" name="action" value="revoke" />
+                    <button className={btnDanger}>Revoke</button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function GrantRequestCard({ grant, orgName }: { grant: Grant; orgName: string }) {
+  const platforms = JSON.parse(grant.scope_platforms) as string[];
+  const restrictions = JSON.parse(grant.restrictions) as string[];
+  return (
+    <div className="rounded-lg border border-amber-200 bg-white p-5">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-zinc-900">{grant.title}</p>
+          <p className="mt-1 text-[13px] text-zinc-500">
+            <span className="font-medium text-zinc-700">{orgName}</span> requests a license
+            to your likeness for <span className="font-medium text-zinc-700">{grant.scope_project}</span>.
+          </p>
+        </div>
+        <Badge status="pending" />
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        {platforms.map((p) => <Chip key={p}>{p}</Chip>)}
+        {restrictions.map((r) => <Chip key={r}>no {r.replace("_", " ")}</Chip>)}
+        <Chip>{daysUntil(grant.expires_at)}-day term</Chip>
+      </div>
+      <div className="mt-4 flex items-center gap-2">
+        <form method="POST" action="/api/grants/decision">
+          <input type="hidden" name="grant_id" value={grant.id} />
+          <input type="hidden" name="action" value="grant" />
+          <button className={btnPrimary}>Grant license</button>
         </form>
-      </Section>
+        <form method="POST" action="/api/grants/decision">
+          <input type="hidden" name="grant_id" value={grant.id} />
+          <input type="hidden" name="action" value="decline" />
+          <button className={btnSecondary}>Decline</button>
+        </form>
+        <Link href={`/dashboard/grants/${grant.id}`}
+          className="ml-auto text-[13px] text-zinc-500 hover:text-zinc-900">
+          Details →
+        </Link>
+      </div>
     </div>
   );
 }
