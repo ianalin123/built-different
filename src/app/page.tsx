@@ -12,7 +12,7 @@ export default async function Home() {
           {session ? (
             <Link href="/dashboard" className="hover:text-white">Dashboard</Link>
           ) : (
-            <a href="/auth/login" className="hover:text-white">Log in</a>
+            <a href="/auth/login?returnTo=/dashboard" className="hover:text-white">Log in</a>
           )}
         </div>
       </nav>
@@ -31,7 +31,7 @@ export default async function Home() {
           and each check produces a signed receipt.
         </p>
         <div className="flex gap-3">
-          <a href="/auth/login" className="rounded-lg bg-white px-6 py-3 font-medium text-black">
+          <a href="/auth/login?returnTo=/dashboard" className="rounded-lg bg-white px-6 py-3 font-medium text-black">
             Start your studio
           </a>
           <Link href="/pricing" className="rounded-lg border border-neutral-700 px-6 py-3 text-neutral-300">
