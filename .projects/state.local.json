@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "project": {
+    "catalog": "prod",
+    "initializedAt": "2026-07-30T21:33:31.261Z",
+    "merchantDisplayName": "hackathon",
+    "merchantId": "acct_1Tz1XwGgxdmNVbiR",
+    "projectId": "project_61V8PXPVMHN5cl4jT16V8PVIASSQALWaasWjl28Po4o4",
+    "projectName": "built-different"
+  },
+  "providers": {
+    "auth0": {
+      "accountRequestId": "facctrq_61V8PYCGoKjLytdsm16V8PVIASSQALWaasWjl28PoGK0",
+      "configuration": {
+        "locality": "us",
+        "naming_prefix": "built-different-spool"
+      },
+      "linkedAt": "2026-07-30T21:34:26.860Z",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T21:34:26.860Z",
+      "status": "complete"
+    }
+  },
+  "resources": {
+    "auth0-client": {
+      "configuration": {
+        "name": "built-different"
+      },
+      "createdAt": "2026-07-30T21:34:38.374Z",
+      "lastRevealedAt": "2026-07-30T21:34:38.524Z",
+      "lastStatus": "complete",
+      "name": "auth0-client",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8PYQ8fTjf1aUJS16V8PVIASSQALWaasWjl28PoOYS",
+      "serviceId": "client"
+    },
+    "auth0-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:34:30.507Z",
+      "lastRevealedAt": "2026-07-30T21:34:30.651Z",
+      "lastStatus": "complete",
+      "name": "auth0-plan",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8PYJNXCSNavWQv16V8PVIASSQALWaasWjl28PoRwu",
+      "serviceId": "free"
+    }
+  },
+  "managedProjectVariableEnvKeys": {
+    ".env": [
+      "APP_BASE_URL",
+      "AUTH0_SECRET",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ]
+  }
+}
