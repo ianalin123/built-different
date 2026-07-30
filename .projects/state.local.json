@@ -26,10 +26,20 @@
   "resources": {
     "auth0-client": {
       "configuration": {
-        "name": "built-different"
+        "name": "built-different",
+        "app_type": "regular_web",
+        "callbacks": [
+          "http://localhost:3000/auth/callback"
+        ],
+        "allowed_logout_urls": [
+          "http://localhost:3000"
+        ],
+        "web_origins": [
+          "http://localhost:3000"
+        ]
       },
       "createdAt": "2026-07-30T21:34:38.374Z",
-      "lastRevealedAt": "2026-07-30T21:34:38.524Z",
+      "lastRevealedAt": "2026-07-30T21:36:37.164Z",
       "lastStatus": "complete",
       "name": "auth0-client",
       "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
