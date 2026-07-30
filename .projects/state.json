@@ -38,6 +38,10 @@
           "envKey": "AUTH0_SECRET"
         },
         {
+          "variableName": "receipt-signing-key",
+          "envKey": "RECEIPT_SIGNING_KEY"
+        },
+        {
           "variableName": "stripe-secret-key",
           "envKey": "STRIPE_SECRET_KEY"
         },
@@ -56,6 +60,10 @@
     "auth0-secret": {
       "name": "auth0-secret",
       "backendId": "fprjvar_61V8PZ2pPuusINOqZ16V8PVIASSQALWaasWjl28Po0AC"
+    },
+    "receipt-signing-key": {
+      "name": "receipt-signing-key",
+      "backendId": "fprjvar_61V8QO7ySadqQUPR616V8PVIASSQALWaasWjl28PoQaG"
     },
     "stripe-secret-key": {
       "name": "stripe-secret-key",

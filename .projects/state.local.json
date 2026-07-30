@@ -63,6 +63,7 @@
     ".env": [
       "APP_BASE_URL",
       "AUTH0_SECRET",
+      "RECEIPT_SIGNING_KEY",
       "STRIPE_SECRET_KEY",
       "STRIPE_WEBHOOK_SECRET"
     ]
