@@ -116,7 +116,7 @@ export default async function CertificatePage({
                 return (
                   <tr key={e.id} className="align-top">
                     <td className="py-2 pr-3 font-mono text-[11px] tabular-nums text-zinc-500">
-                      {e.created_at}
+                      {e.created_at.slice(0, 19).replace("T", " ")}
                     </td>
                     <td className="py-2 pr-3 text-[13px]">{eventTitle(e)}</td>
                     <td className="py-2 pr-3 text-[13px] text-zinc-500">{e.actor_label}</td>

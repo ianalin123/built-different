@@ -12,6 +12,9 @@ const STATUS_TINT: Record<string, string> = {
   expired: "bg-zinc-100 text-zinc-600 border-zinc-200",
   test: "bg-zinc-100 text-zinc-600 border-zinc-200",
   free: "bg-zinc-100 text-zinc-600 border-zinc-200",
+  "rights holder": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  owner: "bg-amber-50 text-amber-700 border-amber-200",
+  producer: "bg-zinc-100 text-zinc-600 border-zinc-200",
 };
 
 export function Badge({ status }: { status: string }) {

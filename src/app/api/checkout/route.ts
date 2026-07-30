@@ -21,8 +21,8 @@ export async function POST(request: Request) {
             price_data: {
               currency: "usd",
               recurring: { interval: "month" },
-              unit_amount: 1000,
-              product_data: { name: "Pro Plan" },
+              unit_amount: 2900,
+              product_data: { name: "Studio — producer seat" },
             },
             quantity: 1,
           },

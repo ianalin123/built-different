@@ -128,7 +128,7 @@ export default async function GrantDetailPage({
                       key={e.id}
                       title={eventTitle(e)}
                       actor={e.actor_label}
-                      timestamp={e.created_at}
+                      timestamp={e.created_at.slice(0, 19).replace("T", " ")}
                       hash={sig ? `${sig.slice(0, 24)}…` : undefined}
                       type={e.type}
                       last={i === events.length - 1}

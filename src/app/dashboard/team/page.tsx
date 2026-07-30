@@ -35,10 +35,7 @@ export default async function TeamPage() {
             <td className="px-4 py-3 text-[13px] font-medium text-zinc-900">{mem.name}</td>
             <td className="px-4 py-3 text-[13px] text-zinc-500">{mem.email}</td>
             <td className="px-4 py-3">
-              <Badge status={mem.role === "talent" ? "active" : "pending"} />
-              <span className="ml-1.5 text-[13px] text-zinc-600">
-                {mem.role === "talent" ? "rights holder" : mem.role}
-              </span>
+              <Badge status={mem.role === "talent" ? "rights holder" : mem.role} />
             </td>
             <td className="px-4 py-3 text-[13px] text-emerald-700">✓ Auth0 verified</td>
             <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">
