@@ -17,3 +17,12 @@ export async function getActiveSubscription(
   });
   return subscriptions.data[0] ?? null;
 }
+
+export async function bumpSeatQuantity(subscriptionId: string): Promise<void> {
+  const stripe = getStripe();
+  const sub = await stripe.subscriptions.retrieve(subscriptionId);
+  const item = sub.items.data[0];
+  await stripe.subscriptions.update(subscriptionId, {
+    items: [{ id: item.id, quantity: (item.quantity ?? 1) + 1 }],
+  });
+}

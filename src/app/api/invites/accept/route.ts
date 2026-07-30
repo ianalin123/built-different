@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 import { db } from "@/lib/db";
+import { bumpSeatQuantity } from "@/lib/billing";
 
 export async function POST(request: Request) {
   const session = await auth0.getSession();
@@ -14,5 +15,16 @@ export async function POST(request: Request) {
   db.prepare("INSERT OR IGNORE INTO members (id, org_id, auth0_sub, email, name, role) VALUES (?,?,?,?,?,?)")
     .run(crypto.randomUUID(), invite.org_id, sub, email ?? "", name ?? email ?? "Member", invite.role);
   db.prepare("UPDATE invites SET status = 'accepted' WHERE id = ?").run(invite.id);
+  if (invite.role === "producer") {
+    const org = db.prepare("SELECT stripe_subscription_id FROM orgs WHERE id = ?")
+      .get(invite.org_id) as { stripe_subscription_id: string | null };
+    if (org.stripe_subscription_id) {
+      try {
+        await bumpSeatQuantity(org.stripe_subscription_id);
+      } catch (err) {
+        console.error("seat bump failed", err);
+      }
+    }
+  }
   return NextResponse.redirect(new URL("/dashboard", request.url), 303);
 }

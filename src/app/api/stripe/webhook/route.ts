@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -21,15 +22,21 @@ export async function POST(request: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
-      console.log("Checkout completed", session.metadata?.auth0_sub, session.customer);
-      // TODO: product-specific fulfillment goes here
+      const sub = session.metadata?.auth0_sub;
+      if (sub) {
+        db.prepare(`UPDATE orgs SET plan = 'pro', stripe_customer_id = ?, stripe_subscription_id = ?
+          WHERE owner_sub = ?`)
+          .run(String(session.customer), String(session.subscription), sub);
+      }
       break;
     }
     case "customer.subscription.updated":
     case "customer.subscription.deleted": {
       const subscription = event.data.object;
-      console.log("Subscription change", event.type, subscription.status, subscription.metadata?.auth0_sub);
-      // TODO: revoke/downgrade access here
+      if (event.type === "customer.subscription.deleted") {
+        db.prepare("UPDATE orgs SET plan = 'free', stripe_subscription_id = NULL WHERE stripe_subscription_id = ?")
+          .run(subscription.id);
+      }
       break;
     }
     default:
