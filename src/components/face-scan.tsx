@@ -33,13 +33,11 @@ export function FaceScan({ initialImage }: { initialImage: string | null }) {
         video: { facingMode: "user", width: { ideal: 1024 }, height: { ideal: 1024 } },
       });
       streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(() => {});
+      }
       setPhase("live");
-      requestAnimationFrame(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        }
-      });
     } catch {
       setPhase("error");
     }
@@ -75,14 +73,15 @@ export function FaceScan({ initialImage }: { initialImage: string | null }) {
   return (
     <div className="w-full max-w-[280px]">
       <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-ink">
-        {(phase === "live" || phase === "scanning") && (
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            className="absolute inset-0 size-full -scale-x-100 object-cover"
-          />
-        )}
+        <video
+          ref={videoRef}
+          muted
+          autoPlay
+          playsInline
+          className={`absolute inset-0 size-full -scale-x-100 object-cover ${
+            phase === "live" || phase === "scanning" ? "" : "hidden"
+          }`}
+        />
         {phase === "captured" && image && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt="Captured face" className="absolute inset-0 size-full object-cover" />
