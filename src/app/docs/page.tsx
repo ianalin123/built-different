@@ -9,6 +9,7 @@ const REASON_CODES: [string, string, string][] = [
   ["GRANT_EXPIRED", "License term has ended", "Request renewal from the rights holder"],
   ["PLATFORM_OUT_OF_SCOPE", "Platform not in the granted scope", "Do not publish to this platform"],
   ["CATEGORY_RESTRICTED", "Content category restricted by the rights holder", "Do not render this content"],
+  ["RENDER_BUDGET_EXHAUSTED", "The grant's render budget has been spent", "Halt renders; request a larger budget"],
 ];
 
 function Code({ children }: { children: string }) {

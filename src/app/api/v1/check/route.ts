@@ -55,12 +55,23 @@ export async function POST(request: Request) {
     } else if (category && (JSON.parse(grant.restrictions) as string[]).includes(category)) {
       reasonCode = "CATEGORY_RESTRICTED";
       reason = `category "${category}" is restricted by the rights holder`;
+    } else if (
+      grant.max_renders !== null &&
+      action === "render" &&
+      grant.renders_used >= grant.max_renders
+    ) {
+      reasonCode = "RENDER_BUDGET_EXHAUSTED";
+      reason = `render budget of ${grant.max_renders} has been spent`;
     } else {
       result = "allowed";
       reasonCode = "WITHIN_SCOPE";
       reason = "within granted scope";
       const lease = new Date(Date.now() + LEASE_MINUTES * 60_000).toISOString();
       validUntil = lease < grant.expires_at ? lease : grant.expires_at;
+      if (grant.max_renders !== null && action === "render") {
+        db.prepare("UPDATE grants SET renders_used = renders_used + 1 WHERE id = ?")
+          .run(grant.id);
+      }
     }
   }
 

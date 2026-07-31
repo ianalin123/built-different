@@ -137,6 +137,9 @@ export default async function GrantsPage() {
                 <div className="flex items-center gap-2">
                   <input name="days" type="number" defaultValue={90} className={`w-24 ${inputCls}`} />
                   <span className="text-[13px] text-zinc-500">day term</span>
+                  <input name="max_renders" type="number" min={1}
+                    placeholder="unlimited" className={`ml-4 w-28 ${inputCls}`} />
+                  <span className="text-[13px] text-zinc-500">render budget</span>
                   <button className={`ml-auto ${btnPrimary}`}>Send clearance request</button>
                 </div>
               </form>

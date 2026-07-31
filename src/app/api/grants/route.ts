@@ -18,6 +18,11 @@ export async function POST(request: Request) {
   const restrictions = form.getAll("restrictions").map(String)
     .filter((r) => RESTRICTIONS.includes(r));
   const days = Number(form.get("days") ?? 90);
+  const maxRendersRaw = String(form.get("max_renders") ?? "").trim();
+  const maxRenders =
+    maxRendersRaw && Number.isInteger(Number(maxRendersRaw)) && Number(maxRendersRaw) > 0
+      ? Number(maxRendersRaw)
+      : null;
   const talent = db.prepare(
     "SELECT id, name FROM members WHERE id = ? AND org_id = ? AND role = 'talent'"
   ).get(talentMemberId, m.org_id) as { id: string; name: string } | undefined;
@@ -27,14 +32,17 @@ export async function POST(request: Request) {
   const grantId = crypto.randomUUID();
   db.prepare(`INSERT INTO grants
     (id, org_id, talent_member_id, title, scope_platforms, scope_project,
-     restrictions, expires_at, created_by_sub)
-    VALUES (?,?,?,?,?,?,?,?,?)`)
+     restrictions, expires_at, max_renders, created_by_sub)
+    VALUES (?,?,?,?,?,?,?,?,?,?)`)
     .run(grantId, m.org_id, talentMemberId, title, JSON.stringify(platforms),
-         project, JSON.stringify(restrictions), expires, session.user.sub);
+         project, JSON.stringify(restrictions), expires, maxRenders, session.user.sub);
   logEvent({
     org_id: m.org_id, grant_id: grantId, actor_type: "member", actor_label: m.name,
     type: "grant.requested",
-    meta: { rights_holder: talent.name, project, platforms, restrictions, days },
+    meta: {
+      rights_holder: talent.name, project, platforms, restrictions, days,
+      ...(maxRenders !== null ? { max_renders: maxRenders } : {}),
+    },
   });
   return NextResponse.redirect(new URL(`/dashboard/grants/${grantId}`, request.url), 303);
 }

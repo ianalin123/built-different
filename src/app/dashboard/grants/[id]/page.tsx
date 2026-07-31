@@ -144,6 +144,12 @@ export default async function GrantDetailPage({
           <Card title="Usage">
             <KV
               rows={[
+                ["Render budget",
+                  <span key="b" className="tabular-nums">
+                    {grant.max_renders === null
+                      ? "unlimited"
+                      : `${grant.renders_used} / ${grant.max_renders} spent`}
+                  </span>],
                 ["Checks allowed",
                   <span key="a" className="tabular-nums">{allowed?.n ?? 0}</span>],
                 ["Checks denied",

@@ -91,6 +91,12 @@ export default async function CertificatePage({
                   <span key="t" className="tabular-nums">
                     {grant.created_at.slice(0, 10)} → {grant.expires_at.slice(0, 10)}
                   </span>],
+                ["Render budget",
+                  <span key="b" className="tabular-nums">
+                    {grant.max_renders === null
+                      ? "unlimited"
+                      : `${grant.renders_used} / ${grant.max_renders} spent`}
+                  </span>],
                 ["Status", <Badge key="s" status={status} />],
               ]}
             />
