@@ -7,6 +7,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 const STUDIO_NAV = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/grants", label: "Grants" },
+  { href: "/marketplace", label: "Marketplace" },
   { href: "/dashboard/team", label: "Team" },
   { href: "/dashboard/developers", label: "Developers" },
 ];
@@ -14,6 +15,7 @@ const STUDIO_NAV = [
 const TALENT_NAV = [
   { href: "/dashboard", label: "Inbox" },
   { href: "/dashboard/grants", label: "My grants" },
+  { href: "/dashboard/listing", label: "My listing" },
   { href: "/dashboard/usage", label: "Usage" },
 ];
 

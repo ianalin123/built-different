@@ -49,6 +49,7 @@ export default async function Home() {
           cameo<span className="text-accent">.</span>
         </span>
         <div className="flex items-center gap-6 text-sm font-medium text-ink-2">
+          <Link href="/marketplace" className="hover:text-ink">Marketplace</Link>
           <Link href="/docs" className="hover:text-ink">Docs</Link>
           <Link href="/pricing" className="hover:text-ink">Pricing</Link>
           {session ? (

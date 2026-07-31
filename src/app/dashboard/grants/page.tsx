@@ -16,7 +16,12 @@ const RESTRICTIONS: [string, string][] = [
 
 type GrantRow = Grant & { talent_name: string; checks: number };
 
-export default async function GrantsPage() {
+export default async function GrantsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ talent?: string }>;
+}) {
+  const { talent: prefillTalentId } = await searchParams;
   const session = await auth0.getSession();
   if (!session) return null;
   const m = getMembership(session.user.sub);
@@ -37,6 +42,17 @@ export default async function GrantsPage() {
     : (db.prepare(
         "SELECT id, name, email FROM members WHERE org_id = ? AND role = 'talent'"
       ).all(m.org_id) as { id: string; name: string; email: string }[]);
+
+  // marketplace-sourced rights holder (may be outside this org)
+  const marketplaceTalent =
+    !isTalent && prefillTalentId && !talent.some((t) => t.id === prefillTalentId)
+      ? (db.prepare(`
+          SELECT mem.id, mem.name, mem.email FROM members mem
+          JOIN listings l ON l.talent_member_id = mem.id AND l.active = 1
+          WHERE mem.id = ? AND mem.role = 'talent'
+        `).get(prefillTalentId) as { id: string; name: string; email: string } | undefined)
+      : undefined;
+  if (marketplaceTalent) talent.push(marketplaceTalent);
 
   return (
     <>
@@ -98,13 +114,18 @@ export default async function GrantsPage() {
                 No rights holders on your roster yet —{" "}
                 <Link href="/dashboard/team" className="underline hover:text-ink">
                   invite one from Team
+                </Link>{" "}
+                or{" "}
+                <Link href="/marketplace" className="underline hover:text-ink">
+                  browse the marketplace
                 </Link>
                 .
               </p>
             ) : (
               <form method="POST" action="/api/grants" className="space-y-4 text-sm">
                 <div className="grid gap-3 md:grid-cols-3">
-                  <select name="talent_member_id" className={inputCls}>
+                  <select name="talent_member_id" defaultValue={prefillTalentId}
+                    className={inputCls}>
                     {talent.map((t) => (
                       <option key={t.id} value={t.id}>{t.name} ({t.email})</option>
                     ))}

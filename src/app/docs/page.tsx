@@ -44,6 +44,7 @@ export default function DocsPage() {
           cameo<span className="text-accent">.</span>
         </Link>
         <div className="flex gap-6 text-sm font-medium text-ink-2">
+          <Link href="/marketplace" className="hover:text-ink">Marketplace</Link>
           <Link href="/pricing" className="hover:text-ink">Pricing</Link>
           <Link href="/dashboard" className="hover:text-ink">Dashboard</Link>
         </div>

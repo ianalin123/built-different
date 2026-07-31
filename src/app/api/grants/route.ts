@@ -23,9 +23,12 @@ export async function POST(request: Request) {
     maxRendersRaw && Number.isInteger(Number(maxRendersRaw)) && Number(maxRendersRaw) > 0
       ? Number(maxRendersRaw)
       : null;
-  const talent = db.prepare(
-    "SELECT id, name FROM members WHERE id = ? AND org_id = ? AND role = 'talent'"
-  ).get(talentMemberId, m.org_id) as { id: string; name: string } | undefined;
+  // roster talent, or any talent with an active marketplace listing (cross-org)
+  const talent = db.prepare(`
+    SELECT mem.id, mem.name FROM members mem
+    LEFT JOIN listings l ON l.talent_member_id = mem.id AND l.active = 1
+    WHERE mem.id = ? AND mem.role = 'talent' AND (mem.org_id = ? OR l.id IS NOT NULL)
+  `).get(talentMemberId, m.org_id) as { id: string; name: string } | undefined;
   if (!talent || !title || !project || platforms.length === 0)
     return NextResponse.json({ error: "invalid clearance request" }, { status: 400 });
   const expires = new Date(Date.now() + days * 86400_000).toISOString();

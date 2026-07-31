@@ -77,6 +77,17 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS idx_events_org ON events(org_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_events_grant ON events(grant_id, created_at);
+CREATE TABLE IF NOT EXISTS listings (
+  id TEXT PRIMARY KEY,
+  talent_member_id TEXT NOT NULL UNIQUE REFERENCES members(id),
+  headline TEXT NOT NULL,
+  bio TEXT NOT NULL DEFAULT '',
+  rate_cents INTEGER NOT NULL DEFAULT 0,
+  face_image TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `);
 
 const GENESIS_HASH = "0".repeat(64);
@@ -134,6 +145,12 @@ export type Grant = {
   status: "pending" | "active" | "declined" | "revoked" | "expired";
   created_by_sub: string; created_at: string;
   decided_at: string | null; revoked_at: string | null;
+};
+
+export type Listing = {
+  id: string; talent_member_id: string; headline: string; bio: string;
+  rate_cents: number; face_image: string | null; active: number;
+  created_at: string; updated_at: string;
 };
 
 export function getMembership(sub: string): Membership | undefined {

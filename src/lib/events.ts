@@ -16,6 +16,8 @@ const EVENT_TITLES: Record<string, (meta: Record<string, string>) => string> = {
   "check.allowed": (m) => `Render check allowed · ${m.platform}`,
   "check.denied": (m) => `Render check denied · ${m.reason_code}`,
   "key.created": (m) => `API key minted (${m.mode})`,
+  "listing.published": (m) => `Marketplace listing published · "${m.headline}"`,
+  "listing.unlisted": () => "Marketplace listing unlisted",
 };
 
 export function eventTitle(e: EventRow): string {
