@@ -1,6 +1,7 @@
 export type EventRow = {
   id: string; grant_id: string | null; actor_type: string; actor_label: string;
-  type: string; meta: string; created_at: string;
+  type: string; meta: string; prev_hash: string | null; hash: string | null;
+  created_at: string;
 };
 
 const EVENT_TITLES: Record<string, (meta: Record<string, string>) => string> = {

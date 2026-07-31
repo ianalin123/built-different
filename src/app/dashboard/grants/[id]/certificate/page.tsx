@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth0 } from "@/lib/auth0";
-import { db, getMembership, resolveGrantStatus, type Grant } from "@/lib/db";
+import { db, getMembership, resolveGrantStatus, verifyEventChain, type Grant } from "@/lib/db";
 import { Badge, Chip, KV, btnSecondary } from "@/components/ui";
 import { PrintButton } from "@/components/copy-field";
 import { eventTitle, type EventRow } from "@/lib/events";
@@ -42,6 +42,7 @@ export default async function CertificatePage({
       .all(id) as { id: string; signature: string }[]).map((r) => [r.id, r.signature])
   );
   const base = process.env.APP_BASE_URL ?? "http://localhost:3000";
+  const chain = verifyEventChain(grant.org_id);
 
   return (
     <div className="mx-auto max-w-2xl bg-white text-zinc-900">
@@ -106,7 +107,8 @@ export default async function CertificatePage({
                 <th className="py-2 pr-3">Timestamp (UTC)</th>
                 <th className="py-2 pr-3">Event</th>
                 <th className="py-2 pr-3">Actor</th>
-                <th className="py-2">Signature</th>
+                <th className="py-2 pr-3">Signature</th>
+                <th className="py-2">Chain hash</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -120,8 +122,11 @@ export default async function CertificatePage({
                     </td>
                     <td className="py-2 pr-3 text-[13px]">{eventTitle(e)}</td>
                     <td className="py-2 pr-3 text-[13px] text-zinc-500">{e.actor_label}</td>
+                    <td className="py-2 pr-3 font-mono text-[11px] text-zinc-400">
+                      {sig ? `${sig.slice(0, 12)}…` : "—"}
+                    </td>
                     <td className="py-2 font-mono text-[11px] text-zinc-400">
-                      {sig ? `${sig.slice(0, 16)}…` : "—"}
+                      {e.hash ? `${e.hash.slice(0, 12)}…` : "—"}
                     </td>
                   </tr>
                 );
@@ -146,6 +151,20 @@ export default async function CertificatePage({
   -H "Content-Type: application/json" \\
   -d '{"receipt_id": "<id>", "signature": "<signature>"}'`}
           </pre>
+          <p className="mt-3 border-t border-zinc-200 pt-3 text-[13px] leading-relaxed text-zinc-600">
+            Events form a per-studio hash chain: each entry&apos;s hash covers its
+            contents plus the previous entry&apos;s hash, so any retroactive edit or
+            deletion breaks every hash after it.{" "}
+            {chain.valid ? (
+              <span className="font-medium text-emerald-700">
+                ✓ Chain verified intact at time of generation.
+              </span>
+            ) : (
+              <span className="font-medium text-red-700">
+                ✗ Chain integrity check FAILED — ledger has been altered.
+              </span>
+            )}
+          </p>
         </section>
 
         <footer className="mt-8 border-t border-zinc-200 pt-4 text-xs text-zinc-400">
