@@ -4,7 +4,12 @@ import { db, getMembership, type Listing } from "@/lib/db";
 import { Badge, Card, PageHeader, btnPrimary, inputCls } from "@/components/ui";
 import { FaceScan } from "@/components/face-scan";
 
-export default async function ListingPage() {
+export default async function ListingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  const { saved } = await searchParams;
   const session = await auth0.getSession();
   if (!session) return null;
   const m = getMembership(session.user.sub);
@@ -26,6 +31,16 @@ export default async function ListingPage() {
           ) : undefined
         }
       />
+
+      {saved && (
+        <div className="mb-4 flex items-center gap-1.5 rounded-xl border border-grass/25 bg-grass-bg px-4 py-2.5 text-[13px] font-medium text-grass">
+          ✓ Listing saved{listing?.active ? (
+            <> — it&apos;s live on the <Link href="/marketplace" className="underline">marketplace</Link>.</>
+          ) : (
+            " — currently unlisted."
+          )}
+        </div>
+      )}
 
       <Card>
         <form method="POST" action="/api/listings" className="flex flex-col gap-8 md:flex-row">

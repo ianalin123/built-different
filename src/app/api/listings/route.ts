@@ -48,5 +48,5 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.redirect(new URL("/dashboard/listing", request.url), 303);
+  return NextResponse.redirect(new URL("/dashboard/listing?saved=1", request.url), 303);
 }
