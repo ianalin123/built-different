@@ -45,30 +45,30 @@ export default async function CertificatePage({
   const chain = verifyEventChain(grant.org_id);
 
   return (
-    <div className="mx-auto max-w-2xl bg-white text-zinc-900">
+    <div className="mx-auto max-w-2xl text-ink">
       <div className="no-print mb-6 flex items-center justify-between">
-        <Link href={`/dashboard/grants/${id}`} className="text-[13px] text-zinc-500 hover:text-zinc-900">
+        <Link href={`/dashboard/grants/${id}`} className="text-[13px] text-ink-3 hover:text-ink">
           ← Back to grant
         </Link>
         <PrintButton className={btnSecondary} />
       </div>
 
-      <div className="rounded-lg border border-zinc-200 p-8 print:border-0 print:p-0">
-        <header className="border-b border-zinc-200 pb-6">
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+      <div className="rounded-2xl border border-line bg-white p-8 shadow-[0_2px_12px_rgba(0,0,0,0.07)] print:border-0 print:p-0 print:shadow-none">
+        <header className="border-b border-line pb-6">
+          <p className="text-xs font-medium uppercase tracking-widest text-ink-3">
             cameo · consent ledger
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-[-0.01em]">
             Certificate of Verification
           </h1>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-ink-3">
             This certificate records the complete chain of custody for a likeness
             license grant, including every verification decision issued against it.
           </p>
         </header>
 
         <section className="mt-6">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="text-xs font-medium uppercase tracking-wider text-ink-3">
             License grant
           </h2>
           <div className="mt-2">
@@ -104,12 +104,12 @@ export default async function CertificatePage({
         </section>
 
         <section className="mt-8">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="text-xs font-medium uppercase tracking-wider text-ink-3">
             Chain of custody
           </h2>
           <table className="mt-2 w-full text-left">
             <thead>
-              <tr className="border-b border-zinc-200 text-xs font-medium text-zinc-500">
+              <tr className="border-b border-line text-xs font-medium text-ink-3">
                 <th className="py-2 pr-3">Timestamp (UTC)</th>
                 <th className="py-2 pr-3">Event</th>
                 <th className="py-2 pr-3">Actor</th>
@@ -117,21 +117,21 @@ export default async function CertificatePage({
                 <th className="py-2">Chain hash</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-cream-2">
               {events.map((e) => {
                 const meta = JSON.parse(e.meta) as { receipt_id?: string };
                 const sig = meta.receipt_id ? receipts.get(meta.receipt_id) : undefined;
                 return (
                   <tr key={e.id} className="align-top">
-                    <td className="py-2 pr-3 font-mono text-[11px] tabular-nums text-zinc-500">
+                    <td className="py-2 pr-3 font-mono text-[11px] tabular-nums text-ink-3">
                       {e.created_at.slice(0, 19).replace("T", " ")}
                     </td>
                     <td className="py-2 pr-3 text-[13px]">{eventTitle(e)}</td>
-                    <td className="py-2 pr-3 text-[13px] text-zinc-500">{e.actor_label}</td>
-                    <td className="py-2 pr-3 font-mono text-[11px] text-zinc-400">
+                    <td className="py-2 pr-3 text-[13px] text-ink-3">{e.actor_label}</td>
+                    <td className="py-2 pr-3 font-mono text-[11px] text-ink-3">
                       {sig ? `${sig.slice(0, 12)}…` : "—"}
                     </td>
-                    <td className="py-2 font-mono text-[11px] text-zinc-400">
+                    <td className="py-2 font-mono text-[11px] text-ink-3">
                       {e.hash ? `${e.hash.slice(0, 12)}…` : "—"}
                     </td>
                   </tr>
@@ -141,39 +141,39 @@ export default async function CertificatePage({
           </table>
         </section>
 
-        <section className="mt-8 rounded-md border border-zinc-200 bg-zinc-50 p-4 print:bg-white">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <section className="mt-8 rounded-md border border-line bg-cream p-4 print:bg-white">
+          <h2 className="text-xs font-medium uppercase tracking-wider text-ink-3">
             Independent verification
           </h2>
-          <p className="mt-2 text-[13px] leading-relaxed text-zinc-600">
+          <p className="mt-2 text-[13px] leading-relaxed text-ink-2">
             Each verification receipt above is signed with HMAC-SHA256 over{" "}
             <code className="font-mono text-[11px]">
               receipt_id.grant_id.result.timestamp
             </code>
             . Any party can confirm a receipt&apos;s authenticity:
           </p>
-          <pre className="mt-2 overflow-x-auto font-mono text-[11px] leading-relaxed text-zinc-600">
+          <pre className="mt-2 overflow-x-auto font-mono text-[11px] leading-relaxed text-ink-2">
 {`curl -X POST ${base}/api/v1/verify \\
   -H "Content-Type: application/json" \\
   -d '{"receipt_id": "<id>", "signature": "<signature>"}'`}
           </pre>
-          <p className="mt-3 border-t border-zinc-200 pt-3 text-[13px] leading-relaxed text-zinc-600">
+          <p className="mt-3 border-t border-line pt-3 text-[13px] leading-relaxed text-ink-2">
             Events form a per-studio hash chain: each entry&apos;s hash covers its
             contents plus the previous entry&apos;s hash, so any retroactive edit or
             deletion breaks every hash after it.{" "}
             {chain.valid ? (
-              <span className="font-medium text-emerald-700">
+              <span className="font-medium text-grass">
                 ✓ Chain verified intact at time of generation.
               </span>
             ) : (
-              <span className="font-medium text-red-700">
+              <span className="font-medium text-rust">
                 ✗ Chain integrity check FAILED — ledger has been altered.
               </span>
             )}
           </p>
         </section>
 
-        <footer className="mt-8 border-t border-zinc-200 pt-4 text-xs text-zinc-400">
+        <footer className="mt-8 border-t border-line pt-4 text-xs text-ink-3">
           Generated {new Date().toISOString()} · Sandbox environment — records are
           not legally binding.
         </footer>

@@ -1,18 +1,81 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", -apple-system, sans-serif;
+  --font-mono: var(--font-dm-mono), "DM Mono", monospace;
+
+  --color-cream: #F5F0E0;
+  --color-cream-2: #EDE8D5;
+  --color-cream-3: #E0D9C4;
+  --color-ink: #1A1A1A;
+  --color-ink-2: #4A4A4A;
+  --color-ink-3: #8A8A8A;
+  --color-accent: #7C6FF7;
+  --color-accent-light: #9D93F9;
+  --color-accent-dark: #5B50D6;
+  --color-accent-2: #EDE9FE;
+  --color-accent-3: #F5F3FF;
+  --color-line: #DDD6C0;
+  --color-line-2: #C8BFA8;
+  --color-grass: #16A34A;
+  --color-grass-bg: #DCFCE7;
+  --color-rust: #DC2626;
+  --color-rust-bg: #FEE2E2;
+  --color-hay: #D97706;
+  --color-hay-bg: #FEF3C7;
+
+  --shadow-card-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-card-md: 0 4px 24px rgba(0, 0, 0, 0.09);
+  --shadow-card-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
 }
 
 body {
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  background: #fafafa;
-  color: #18181b;
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", -apple-system, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.display-xl {
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+.display-lg {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+
+.display-md {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.text-label {
+  font-family: var(--font-dm-mono), "DM Mono", monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
 }
 
 @media print {
   .no-print {
     display: none !important;
+  }
+  body {
+    background: white;
   }
 }

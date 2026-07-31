@@ -42,16 +42,16 @@ export default async function UsagePage() {
               <td className="px-4 py-2.5"><Badge status={r.result} /></td>
               <td className="px-4 py-2.5">
                 <Link href={`/dashboard/grants/${r.grant_id}`}
-                  className="text-[13px] font-medium text-zinc-900 hover:underline">
+                  className="text-[13px] font-medium text-ink hover:underline">
                   {r.scope_project}
                 </Link>
-                <p className="text-xs text-zinc-500">{r.title}</p>
+                <p className="text-xs text-ink-3">{r.title}</p>
               </td>
-              <td className="px-4 py-2.5 text-[13px] text-zinc-600">
+              <td className="px-4 py-2.5 text-[13px] text-ink-2">
                 {r.action} · {r.platform}
               </td>
-              <td className="px-4 py-2.5 font-mono text-[11px] text-zinc-500">{r.reason_code}</td>
-              <td className="px-4 py-2.5 text-[13px] tabular-nums text-zinc-500">
+              <td className="px-4 py-2.5 font-mono text-[11px] text-ink-3">{r.reason_code}</td>
+              <td className="px-4 py-2.5 text-[13px] tabular-nums text-ink-3">
                 {r.created_at.slice(0, 19).replace("T", " ")}
               </td>
             </tr>

@@ -84,7 +84,7 @@ export default async function GrantDetailPage({
                   </span>],
                 ["Restrictions",
                   restrictions.length === 0 ? (
-                    <span className="text-zinc-400">none</span>
+                    <span className="text-ink-3">none</span>
                   ) : (
                     <span key="r" className="flex flex-wrap gap-1">
                       {restrictions.map((r) => <Chip key={r}>no {r.replace("_", " ")}</Chip>)}
@@ -98,7 +98,7 @@ export default async function GrantDetailPage({
               ]}
             />
             {isTalent && (
-              <div className="mt-4 flex gap-2 border-t border-zinc-100 pt-4">
+              <div className="mt-4 flex gap-2 border-t border-cream-2 pt-4">
                 {status === "pending" && (
                   <>
                     <DecisionForm grantId={grant.id} action="grant" returnTo={detailPath}
@@ -117,7 +117,7 @@ export default async function GrantDetailPage({
 
           <Card title="Audit trail">
             {events.length === 0 ? (
-              <p className="text-sm text-zinc-400">No events recorded.</p>
+              <p className="text-sm text-ink-3">No events recorded.</p>
             ) : (
               <ul>
                 {events.map((e, i) => {
@@ -162,14 +162,14 @@ export default async function GrantDetailPage({
             />
           </Card>
           <Card title="Verification">
-            <p className="text-[13px] leading-relaxed text-zinc-500">
+            <p className="text-[13px] leading-relaxed text-ink-3">
               Render pipelines verify this grant with{" "}
-              <code className="font-mono text-xs text-zinc-700">POST /api/v1/check</code>.
+              <code className="font-mono text-xs text-ink-2">POST /api/v1/check</code>.
               Every decision — allow or deny — produces an HMAC-signed receipt that appears
               in the audit trail and can be verified by anyone via{" "}
-              <code className="font-mono text-xs text-zinc-700">POST /api/v1/verify</code>.
+              <code className="font-mono text-xs text-ink-2">POST /api/v1/verify</code>.
             </p>
-            <Link href="/docs" className="mt-3 inline-block text-[13px] text-zinc-700 underline hover:text-zinc-900">
+            <Link href="/docs" className="mt-3 inline-block text-[13px] text-ink-2 underline hover:text-ink">
               API reference →
             </Link>
           </Card>

@@ -64,15 +64,15 @@ export default async function GrantsPage() {
           headers={["Grant", "Rights holder", "Scope", "Term", "Status", "Checks"]}
         >
           {grants.map((g) => (
-            <tr key={g.id} className="hover:bg-zinc-50">
+            <tr key={g.id} className="hover:bg-accent-3">
               <td className="px-4 py-3">
                 <Link href={`/dashboard/grants/${g.id}`}
-                  className="text-[13px] font-medium text-zinc-900 hover:underline">
+                  className="text-[13px] font-medium text-ink hover:underline">
                   {g.title}
                 </Link>
-                <p className="text-xs text-zinc-500">{g.scope_project}</p>
+                <p className="text-xs text-ink-3">{g.scope_project}</p>
               </td>
-              <td className="px-4 py-3 text-[13px] text-zinc-700">{g.talent_name}</td>
+              <td className="px-4 py-3 text-[13px] text-ink-2">{g.talent_name}</td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
                   {(JSON.parse(g.scope_platforms) as string[]).map((p) => (
@@ -80,11 +80,11 @@ export default async function GrantsPage() {
                   ))}
                 </div>
               </td>
-              <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">
+              <td className="px-4 py-3 text-[13px] tabular-nums text-ink-3">
                 {g.status === "expired" ? "Expired" : `${daysUntil(g.expires_at)}d left`}
               </td>
               <td className="px-4 py-3"><Badge status={g.status} /></td>
-              <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">{g.checks}</td>
+              <td className="px-4 py-3 text-[13px] tabular-nums text-ink-3">{g.checks}</td>
             </tr>
           ))}
         </CardTable>
@@ -94,9 +94,9 @@ export default async function GrantsPage() {
         <div className="mt-6">
           <Card title="Request clearance">
             {talent.length === 0 ? (
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-ink-3">
                 No rights holders on your roster yet —{" "}
-                <Link href="/dashboard/team" className="underline hover:text-zinc-900">
+                <Link href="/dashboard/team" className="underline hover:text-ink">
                   invite one from Team
                 </Link>
                 .
@@ -115,31 +115,31 @@ export default async function GrantsPage() {
                     className={inputCls} />
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
-                  <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  <span className="text-xs font-medium uppercase tracking-wider text-ink-3">
                     Platforms
                   </span>
                   {PLATFORMS.map((p) => (
-                    <label key={p} className="flex items-center gap-1.5 text-[13px] text-zinc-700">
+                    <label key={p} className="flex items-center gap-1.5 text-[13px] text-ink-2">
                       <input type="checkbox" name="platforms" value={p} /> {p}
                     </label>
                   ))}
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
-                  <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  <span className="text-xs font-medium uppercase tracking-wider text-ink-3">
                     Restrictions
                   </span>
                   {RESTRICTIONS.map(([value, label]) => (
-                    <label key={value} className="flex items-center gap-1.5 text-[13px] text-zinc-700">
+                    <label key={value} className="flex items-center gap-1.5 text-[13px] text-ink-2">
                       <input type="checkbox" name="restrictions" value={value} /> {label}
                     </label>
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
                   <input name="days" type="number" defaultValue={90} className={`w-24 ${inputCls}`} />
-                  <span className="text-[13px] text-zinc-500">day term</span>
+                  <span className="text-[13px] text-ink-3">day term</span>
                   <input name="max_renders" type="number" min={1}
                     placeholder="unlimited" className={`ml-4 w-28 ${inputCls}`} />
-                  <span className="text-[13px] text-zinc-500">render budget</span>
+                  <span className="text-[13px] text-ink-3">render budget</span>
                   <button className={`ml-auto ${btnPrimary}`}>Send clearance request</button>
                 </div>
               </form>

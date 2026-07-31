@@ -48,15 +48,15 @@ export default async function DevelopersPage({
         title="Developers"
         description="Machine identities for your render pipeline, and the log of every verification decision."
         action={
-          <Link href="/docs" className="text-[13px] text-zinc-700 underline hover:text-zinc-900">
+          <Link href="/docs" className="text-[13px] text-ink-2 underline hover:text-ink">
             API reference →
           </Link>
         }
       />
 
       {new_key && (
-        <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-          <p className="text-sm font-medium text-emerald-800">
+        <div className="mb-6 rounded-lg border border-grass/25 bg-grass-bg p-4">
+          <p className="text-sm font-medium text-grass">
             API key created — copy it now. This key is shown once.
           </p>
           <div className="mt-2">
@@ -75,15 +75,15 @@ export default async function DevelopersPage({
         <CardTable headers={["Label", "Key", "Mode", "Created", "Last used"]}>
           {keys.map((k) => (
             <tr key={k.id}>
-              <td className="px-4 py-3 text-[13px] font-medium text-zinc-900">{k.label}</td>
-              <td className="px-4 py-3 font-mono text-xs text-zinc-500">
+              <td className="px-4 py-3 text-[13px] font-medium text-ink">{k.label}</td>
+              <td className="px-4 py-3 font-mono text-xs text-ink-3">
                 {k.prefix.replace("…", "••••")}
               </td>
               <td className="px-4 py-3"><Badge status={k.mode} /></td>
-              <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">
+              <td className="px-4 py-3 text-[13px] tabular-nums text-ink-3">
                 {k.created_at.slice(0, 10)}
               </td>
-              <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">
+              <td className="px-4 py-3 text-[13px] tabular-nums text-ink-3">
                 {relativeTime(k.last_used_at)}
               </td>
             </tr>
@@ -106,7 +106,7 @@ export default async function DevelopersPage({
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-ink-3">
           Request log
         </h2>
         {receipts.length === 0 ? (
@@ -115,7 +115,7 @@ export default async function DevelopersPage({
             title="No verification checks yet"
             body="Every POST /api/v1/check — allowed or denied — is receipted here with its signature."
             action={
-              <code className="block rounded-md bg-zinc-100 px-3 py-2 text-left font-mono text-[11px] text-zinc-600">
+              <code className="block rounded-md bg-cream-2 px-3 py-2 text-left font-mono text-[11px] text-ink-2">
                 curl -X POST /api/v1/check -H &quot;Authorization: Bearer cam_live_…&quot; \<br />
                 &nbsp;&nbsp;-d &apos;{"{"}&quot;grant_id&quot;:&quot;…&quot;,&quot;platform&quot;:&quot;dramabox&quot;,&quot;action&quot;:&quot;render&quot;{"}"}&apos;
               </code>
@@ -126,20 +126,20 @@ export default async function DevelopersPage({
             {receipts.map((r) => (
               <tr key={r.id}>
                 <td className="px-4 py-2.5"><Badge status={r.result} /></td>
-                <td className="px-4 py-2.5 font-mono text-[11px] text-zinc-600">{r.reason_code}</td>
+                <td className="px-4 py-2.5 font-mono text-[11px] text-ink-2">{r.reason_code}</td>
                 <td className="px-4 py-2.5">
                   <Link href={`/dashboard/grants/${r.grant_id}`}
-                    className="font-mono text-[11px] text-zinc-500 hover:text-zinc-900 hover:underline">
+                    className="font-mono text-[11px] text-ink-3 hover:text-ink hover:underline">
                     {r.grant_id.slice(0, 8)}…
                   </Link>
                 </td>
-                <td className="px-4 py-2.5 text-[13px] text-zinc-600">
+                <td className="px-4 py-2.5 text-[13px] text-ink-2">
                   {r.action} · {r.platform}
                 </td>
-                <td className="px-4 py-2.5 font-mono text-[11px] text-zinc-400">
+                <td className="px-4 py-2.5 font-mono text-[11px] text-ink-3">
                   {r.signature.slice(0, 12)}…
                 </td>
-                <td className="px-4 py-2.5 text-[13px] tabular-nums text-zinc-500">
+                <td className="px-4 py-2.5 text-[13px] tabular-nums text-ink-3">
                   {r.created_at.slice(5, 19).replace("T", " ")}
                 </td>
               </tr>

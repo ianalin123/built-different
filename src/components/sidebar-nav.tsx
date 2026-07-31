@@ -18,8 +18,8 @@ export function SidebarNav({ items }: { items: { href: string; label: string }[]
             href={item.href}
             className={`rounded-md px-2 py-1.5 text-[13px] font-medium ${
               active
-                ? "bg-zinc-200/60 text-zinc-900"
-                : "text-zinc-600 hover:bg-zinc-200/60 hover:text-zinc-900"
+                ? "bg-accent-2 text-accent-dark"
+                : "text-ink-2 hover:bg-cream-2 hover:text-ink"
             }`}
           >
             {item.label}

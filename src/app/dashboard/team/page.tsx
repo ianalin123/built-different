@@ -32,13 +32,13 @@ export default async function TeamPage() {
       <CardTable headers={["Name", "Email", "Role", "Identity", "Joined"]}>
         {members.map((mem) => (
           <tr key={mem.id}>
-            <td className="px-4 py-3 text-[13px] font-medium text-zinc-900">{mem.name}</td>
-            <td className="px-4 py-3 text-[13px] text-zinc-500">{mem.email}</td>
+            <td className="px-4 py-3 text-[13px] font-medium text-ink">{mem.name}</td>
+            <td className="px-4 py-3 text-[13px] text-ink-3">{mem.email}</td>
             <td className="px-4 py-3">
               <Badge status={mem.role === "talent" ? "rights holder" : mem.role} />
             </td>
-            <td className="px-4 py-3 text-[13px] text-emerald-700">✓ Auth0 verified</td>
-            <td className="px-4 py-3 text-[13px] tabular-nums text-zinc-500">
+            <td className="px-4 py-3 text-[13px] text-grass">✓ Auth0 verified</td>
+            <td className="px-4 py-3 text-[13px] tabular-nums text-ink-3">
               {mem.created_at.slice(0, 10)}
             </td>
           </tr>
@@ -56,7 +56,7 @@ export default async function TeamPage() {
             </select>
             <button className={btnPrimary}>Create invite</button>
           </form>
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-ink-3">
             Creates a share-link below. Send it however you like — Cameo never emails
             your roster.
           </p>
@@ -70,7 +70,7 @@ export default async function TeamPage() {
             <ul className="space-y-2">
               {invites.map((i) => (
                 <li key={i.token}>
-                  <p className="mb-1 text-xs text-zinc-500">
+                  <p className="mb-1 text-xs text-ink-3">
                     {i.email} · {i.role === "talent" ? "rights holder" : i.role}
                   </p>
                   <CopyField value={`${base}/invite/${i.token}`}

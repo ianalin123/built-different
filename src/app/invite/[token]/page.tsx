@@ -11,32 +11,39 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   `).get(token) as { role: string; status: string; org_name: string } | undefined;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-8">
-      {!invite || invite.status !== "pending" ? (
-        <p className="text-neutral-500">This invite is invalid or already used.</p>
-      ) : (
-        <>
-          <h1 className="text-2xl font-semibold">
-            Join {invite.org_name} as {invite.role}
-          </h1>
-          <p className="text-neutral-500">
-            {invite.role === "talent"
-              ? "You control every use of your likeness. Approve, scope, and revoke at any time."
-              : "You'll be able to request likeness grants and run consent checks."}
-          </p>
-          {session ? (
-            <form method="POST" action="/api/invites/accept">
-              <input type="hidden" name="token" value={token} />
-              <button className="rounded-lg bg-black px-5 py-2.5 text-white">Accept invite</button>
-            </form>
-          ) : (
-            <Link href={`/auth/login?returnTo=/invite/${token}`}
-              className="rounded-lg bg-black px-5 py-2.5 text-center text-white">
-              Log in to accept
-            </Link>
-          )}
-        </>
-      )}
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-8">
+      <div className="rounded-2xl border border-line bg-white p-8 shadow-[0_4px_24px_rgba(0,0,0,0.09)]">
+        {!invite || invite.status !== "pending" ? (
+          <p className="text-ink-3">This invite is invalid or already used.</p>
+        ) : (
+          <div className="flex flex-col gap-5">
+            <p className="text-label">
+              cameo · {invite.role === "talent" ? "rights holder" : invite.role} invite
+            </p>
+            <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink">
+              Join {invite.org_name}
+            </h1>
+            <p className="text-sm leading-relaxed text-ink-2">
+              {invite.role === "talent"
+                ? "You control every use of your likeness. Approve, scope, and revoke at any time."
+                : "You'll be able to request likeness grants and run consent checks."}
+            </p>
+            {session ? (
+              <form method="POST" action="/api/invites/accept">
+                <input type="hidden" name="token" value={token} />
+                <button className="w-full rounded-[10px] bg-accent px-5 py-2.5 text-sm font-bold text-white transition hover:bg-accent-dark hover:shadow-[0_4px_16px_rgba(124,111,247,0.35)]">
+                  Accept invite
+                </button>
+              </form>
+            ) : (
+              <Link href={`/auth/login?returnTo=/invite/${token}`}
+                className="w-full rounded-[10px] bg-accent px-5 py-2.5 text-center text-sm font-bold text-white transition hover:bg-accent-dark">
+                Log in to accept
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
     </main>
   );
 }

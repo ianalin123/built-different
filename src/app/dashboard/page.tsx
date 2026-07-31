@@ -14,11 +14,11 @@ export default async function Dashboard() {
 
   if (!m) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-8 text-zinc-900">
+      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-8 text-ink">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">cameo</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-ink-3">cameo</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-[-0.01em]">Set up your studio</h1>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-ink-3">
             Create an organization to start requesting license grants. Rights holders
             join via invite link — no emails are sent.
           </p>
@@ -108,16 +108,16 @@ function StudioOverview({ orgId }: { orgId: string }) {
       </div>
 
       {(members.n === 0 || keys.n === 0) && events.length > 0 && (
-        <p className="mt-4 text-sm text-zinc-500">
+        <p className="mt-4 text-sm text-ink-3">
           Setup:{" "}
           {members.n === 0 && (
-            <Link href="/dashboard/team" className="underline hover:text-zinc-900">
+            <Link href="/dashboard/team" className="underline hover:text-ink">
               invite a rights holder
             </Link>
           )}
           {members.n === 0 && keys.n === 0 && " · "}
           {keys.n === 0 && (
-            <Link href="/dashboard/developers" className="underline hover:text-zinc-900">
+            <Link href="/dashboard/developers" className="underline hover:text-ink">
               mint an API key
             </Link>
           )}
@@ -156,19 +156,19 @@ function TalentInbox({ memberId, orgName }: { memberId: string; orgName: string 
 
       {active.length > 0 && (
         <div className="mt-8">
-          <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-ink-3">
             Active grants
           </h2>
           <div className="space-y-3">
             {active.map((g) => (
               <div key={g.id}
-                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-4">
+                className="flex items-center justify-between rounded-lg border border-line bg-white p-4">
                 <div>
                   <Link href={`/dashboard/grants/${g.id}`}
-                    className="text-sm font-medium text-zinc-900 hover:underline">
+                    className="text-sm font-medium text-ink hover:underline">
                     {g.title}
                   </Link>
-                  <p className="mt-0.5 text-[13px] tabular-nums text-zinc-500">
+                  <p className="mt-0.5 text-[13px] tabular-nums text-ink-3">
                     {g.scope_project} · expires in {daysUntil(g.expires_at)} days
                   </p>
                 </div>
@@ -193,13 +193,13 @@ function GrantRequestCard({ grant, orgName }: { grant: Grant; orgName: string })
   const platforms = JSON.parse(grant.scope_platforms) as string[];
   const restrictions = JSON.parse(grant.restrictions) as string[];
   return (
-    <div className="rounded-lg border border-amber-200 bg-white p-5">
+    <div className="rounded-2xl border border-hay/30 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-zinc-900">{grant.title}</p>
-          <p className="mt-1 text-[13px] text-zinc-500">
-            <span className="font-medium text-zinc-700">{orgName}</span> requests a license
-            to your likeness for <span className="font-medium text-zinc-700">{grant.scope_project}</span>.
+          <p className="text-sm font-medium text-ink">{grant.title}</p>
+          <p className="mt-1 text-[13px] text-ink-3">
+            <span className="font-medium text-ink-2">{orgName}</span> requests a license
+            to your likeness for <span className="font-medium text-ink-2">{grant.scope_project}</span>.
           </p>
         </div>
         <Badge status="pending" />
@@ -221,7 +221,7 @@ function GrantRequestCard({ grant, orgName }: { grant: Grant; orgName: string })
           <button className={btnSecondary}>Decline</button>
         </form>
         <Link href={`/dashboard/grants/${grant.id}`}
-          className="ml-auto text-[13px] text-zinc-500 hover:text-zinc-900">
+          className="ml-auto text-[13px] text-ink-3 hover:text-ink">
           Details →
         </Link>
       </div>
